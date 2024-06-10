@@ -1,6 +1,6 @@
 const { Schema, Types } = require('mongoose');
 
-const assignmentSchema  = new Schema (
+const usernameSchema  = new Schema (
     {
         username: {
             type: String,
@@ -19,5 +19,13 @@ const assignmentSchema  = new Schema (
                 message: props => `${props.value} is an invalid email!`
             }
         },
+    },
+    {
+        toJSON: {
+            getters: true,
+        },
+        id: false,
     }
-)
+);
+
+module.exports = usernameSchema;
