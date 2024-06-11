@@ -1,6 +1,7 @@
-const { Schema, Types } = require('mongoose');
+const { Schema, model } = require('mongoose');
+const Thought = require('./Thought');
 
-const usernameSchema  = new Schema (
+const userSchema  = new Schema (
     {
         username: {
             type: String,
@@ -16,16 +17,35 @@ const usernameSchema  = new Schema (
                 validator: function(v) {
                     return /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/.test(v);
                 },
-                message: props => `${props.value} is an invalid email!`
             }
         },
+        thoughts: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'thought'
+            }
+        ],
+        friends: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
+        ]
     },
     {
         toJSON: {
-            getters: true,
+            virtuals: false,
         },
         id: false,
     }
 );
 
-module.exports = usernameSchema;
+
+// virtual for displaying number of friends each user has
+userSchema.virtual('friendCount').get(function () {
+    return this.friends.length;
+})
+
+const User = model('user', userSchema);
+
+module.exports = User;

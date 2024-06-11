@@ -1,5 +1,26 @@
-const { Schema, Types } = require('mongoose');
+const { ObjectId } = require('bson');
+const { Schema, model } = require('mongoose');
 
+//schema for creating a reaction
+const reactionSchema = new Schema(
+    {
+        reactionBody: {
+            type: String,
+            required: true,
+            maxlength: 200
+        },
+        username: {
+            type: String,
+            required: true
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }
+);
+
+//schema for creating a thought
 const thoughtSchema = new Schema(
     {
         thoughtText: {
@@ -11,19 +32,27 @@ const thoughtSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            //getter method for timestamp query
         },
         username: {
             type: String,
             required: true,
-            refrence:{
-                model: 'usernameSchema',
-                key: 'username',
-            },
         },
-        reactions: {
-            type: Array,
-            //nested reactionsSchema
-        }
+        reactions: [reactionSchema]
+    },
+    {
+        toJSON: {
+            virtuals: true,
+        },
+        id: false
     }
-)
+);
+
+//virtual for keeping count of reactiongs
+thoughtSchema
+.virtual('reactionCount')
+.get(function () {
+    return this.reactions.length;
+})
+const Thought = model('thought', thoughtSchema);
+
+module.exports = Thought;
